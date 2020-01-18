@@ -51,7 +51,7 @@ int main()
 	int threads = 0;
 	int input = 0;
 	char choice;
-	const char* name = "test.bmp";
+	const char* name = "yoda.bmp";
 	const char* newname = "graytest.bmp";
 	bool ifAsm = false;
 	string flush = "";
@@ -77,7 +77,7 @@ int main()
 	if (choice == 'y' || choice == 'Y')
 	{
 		ifAsm = true;
-		cout << "Wybrana biblioteka: asm";
+		cout << "Wybrana biblioteka: asm\n";
 	}
 	else
 	{
@@ -92,11 +92,15 @@ int main()
 	int wdth = *(int*)&header[18];
 	int hght = *(int*)&header[22];
 
-	int size = 4 * wdth * hght; // rozmiar tablicy pikseli (b, g, r, pusto)
-	unsigned char* data = new unsigned char[size]; //alokowanie 4 bajtow na piksel
+	int size = 3 * wdth * hght; // rozmiar tablicy pikseli (b, g, r)
+	unsigned char* data = new unsigned char[size]; //alokowanie 3 bajtow na piksel
 	fread(data, sizeof(unsigned char), size, f); //zczytanie wartosci kolorow pikseli
 	fclose(f);
-	
+	//for (int i = 0; i < size/100;)
+	//{
+	//	cout << (float)data[i] << " " << (float)data[i + 1] << " " << (float)data[i + 2] << "\n";
+	//	i += 3;
+	//}
 	if (ifAsm)//korzystaj z biblioteki asm, jesli uzytkownik tego chce
 	{
 		
@@ -111,13 +115,19 @@ int main()
 			threadsVec[i].join();
 		}
 	}
-	FILE* newf = fopen(newname, "w"); //zapis nowej bitmapy do pliku
+	FILE* newf = fopen(newname, "w"); //utworzenie pustego pliku
+	fclose(newf);
+	newf = fopen(newname, "a");  //dopisanie do pliku nowej bitmapy
 	
 	fwrite(header, sizeof(unsigned char), 54, newf); //dodanie naglowka do nowego pliku bmp
 	fwrite(data, sizeof(unsigned char), size, newf); //dopisanie wartosci pikseli do pliku bmp
 	fclose(newf);
-
-
+	//cout << "\n\nNOWE\n\n";
+	//for (int i = 0; i < size / 100;)
+	//{
+	//	cout << (float)data[i] << " " << (float)data[i + 1] << " " << (float)data[i + 2] << "\n";
+	//	i += 3;
+	//}
 	
 	
 	return 0;

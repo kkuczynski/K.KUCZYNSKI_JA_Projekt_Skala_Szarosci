@@ -1,7 +1,3 @@
-﻿  stdafx.cpp
-  dllmain.cpp
-  JACpp.cpp
-c:\users\krzys\source\repos\k.kuczynski_ja_projekt_skala_szarosci\jacpp\jacpp.cpp(19): warning C4244: '=': conversion from 'double' to 'unsigned char', possible loss of data
-  Generating Code...
-     Creating library C:\Users\krzys\source\repos\K.KUCZYNSKI_JA_Projekt_Skala_Szarosci\x64\Debug\JACpp.lib and object C:\Users\krzys\source\repos\K.KUCZYNSKI_JA_Projekt_Skala_Szarosci\x64\Debug\JACpp.exp
+﻿  JACpp.cpp
+c:\users\krzys\source\repos\k.kuczynski_ja_projekt_skala_szarosci\jacpp\jacpp.cpp(18): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
   JACpp.vcxproj -> C:\Users\krzys\source\repos\K.KUCZYNSKI_JA_Projekt_Skala_Szarosci\x64\Debug\JACpp.dll
