@@ -219,6 +219,12 @@ public:
 		{
 			tab[i] = tab[i - this->wdth_in_bytes];
 		}
+
+		delete b1;
+		delete b2;
+		delete b3;
+		delete b4;
+		delete groupped;
 		return true;
 	}
 	void getpadding()
@@ -232,11 +238,11 @@ public:
 	void CPPThreads(int threads) //funkcja tworzaca wektor watkow z funkcjami biblioteki CPP
 	{
 		vector<thread> threads_vec(threads); //utworzenie wektora watkow
-		for (int i = 0; i < threads-1; i++)
+		for (int i = 0; i < threads; i++)
 		{
-			threads_vec[i] = thread(CPP, this->tab, wdth, wdth_in_bytes, int(floor(float(hght) / float(threads) * i)), int(ceil((float)hght / (float)threads) * (i + 1)));//wyliczenie poczatku i konca obszaru tab dla jednego watku
+			threads_vec[i] = thread(CPP, this->tab, wdth, wdth_in_bytes, int(floor(float(hght) / float(threads) * i)), int(((float)hght / (float)threads) * (i + 1)));//wyliczenie poczatku i konca obszaru tab dla jednego watku
 		}
-		threads_vec[threads-1] = thread(CPP, this->tab, wdth, wdth_in_bytes, int(floor(float(hght) / float(threads) * (threads-1))), int(((float)hght / (float)threads) * (threads)));//Ostatni obszar poza petla bez zaokraglenia end w gore
+		//threads_vec[threads-1] = thread(CPP, this->tab, wdth, wdth_in_bytes, int(floor(float(hght) / float(threads) * (threads-1))), int(((float)hght / (float)threads) * (threads)));//Ostatni obszar poza petla bez zaokraglenia end w gore
 
 		for (int i = 0; i < threads; i++)
 		{
@@ -248,11 +254,11 @@ public:
 	void ASMThreads(int threads)//funkcja tworzaca wektor watkow z funkcjami biblioteki asm
 	{
 		vector<thread> threads_vec(threads); //utworzenie wektora watkow
-		for (int i = 0; i < threads-1; i++)
+		for (int i = 0; i < threads; i++)
 		{
-			threads_vec[i] = thread(ASM, this->tab, wdth, wdth_in_bytes, int(floor(float(hght) / float(threads) * i)), int(ceil((float)hght / (float)threads) * (i + 1)));//wyliczenie poczatku i konca obszaru tab dla jednego watku
+			threads_vec[i] = thread(ASM, this->tab, wdth, wdth_in_bytes, int(floor(float(hght) / float(threads) * i)), int(((float)hght / (float)threads) * (i + 1)));//wyliczenie poczatku i konca obszaru tab dla jednego watku
 		}
-		threads_vec[threads - 1] = thread(ASM, this->tab, wdth, wdth_in_bytes, int(floor(float(hght) / float(threads) * (threads-1))), int(((float)hght / (float)threads) * (threads)));//Ostatni obszar poza petla bez zaokraglenia end w gore
+		//threads_vec[threads - 1] = thread(ASM, this->tab, wdth, wdth_in_bytes, int(floor(float(hght) / float(threads) * (threads-1))), int(((float)hght / (float)threads) * (threads)));//Ostatni obszar poza petla bez zaokraglenia end w gore
 		for (int i = 0; i < threads; i++)
 		{
 			threads_vec[i].join();
