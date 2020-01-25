@@ -1,2 +1,6 @@
-﻿     Creating library C:\Users\krzys\source\repos\K.KUCZYNSKI_JA_Projekt_Skala_Szarosci\x64\Debug\JAAsm.lib and object C:\Users\krzys\source\repos\K.KUCZYNSKI_JA_Projekt_Skala_Szarosci\x64\Debug\JAAsm.exp
-  JAAsm.vcxproj -> C:\Users\krzys\source\repos\K.KUCZYNSKI_JA_Projekt_Skala_Szarosci\x64\Debug\JAAsm.dll
+﻿  Assembling JAAsm.asm...
+JAAsm.asm(7): warning A6004: procedure argument or local not referenced : hInstDLL
+JAAsm.asm(7): warning A6004: procedure argument or local not referenced : reason
+JAAsm.asm(7): warning A6004: procedure argument or local not referenced : reserved1
+     Creating library C:\Users\Krzyś\source\repos\K.KUCZYNSKI_JA_Projekt_Skala_Szarosci\x64\Debug\JAAsm.lib and object C:\Users\Krzyś\source\repos\K.KUCZYNSKI_JA_Projekt_Skala_Szarosci\x64\Debug\JAAsm.exp
+  JAAsm.vcxproj -> C:\Users\Krzyś\source\repos\K.KUCZYNSKI_JA_Projekt_Skala_Szarosci\x64\Debug\JAAsm.dll
