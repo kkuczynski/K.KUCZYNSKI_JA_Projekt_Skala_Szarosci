@@ -9,6 +9,7 @@ using namespace std;
 #include <thread>
 #include <string>
 #include <vector>
+#include <chrono> 
 void MyProc2(unsigned char* tab, int wdth, int wdth_in_bytes, int start, int end);
 
 int CPP(unsigned char* tab, int wdth, int wdth_in_bytes, int start, int end)
@@ -294,7 +295,7 @@ int main()
 	int threads = 0;
 	int input = 0;
 	char choice;
-	const char* name = "test.bmp";
+	const char* name = "bigtest.bmp";
 	const char* newname = "graytest.bmp";
 	bool ifAsm = false;
 	string flush = "";
@@ -331,19 +332,23 @@ int main()
 	{
 		if (bmp.loadfile(name))
 		{
-			
+			auto start = chrono::high_resolution_clock::now();
 			bmp.ASMThreads(threads);
-			
+			auto stop = chrono::high_resolution_clock::now();
+			auto dura = chrono::duration_cast<chrono::microseconds>(stop - start);
+			cout << "Biblioteka: asm - Watki: " << threads << " - czas: "<< dura.count() << endl;
 			bmp.savefile(newname);
 		}
 	}
 	else
 	{
 		if (bmp.loadfile(name))
-		{
-			
+		{	
+			auto start = chrono::high_resolution_clock::now();
 			bmp.CPPThreads(threads);
-			
+			auto stop = chrono::high_resolution_clock::now();
+			auto dura = chrono::duration_cast<chrono::microseconds>(stop - start);
+			cout << "Biblioteka: c++ - Watki: " << threads << " - czas: " << dura.count() << endl;
 			bmp.savefile(newname);
 		}
 		
