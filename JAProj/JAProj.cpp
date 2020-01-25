@@ -214,7 +214,7 @@ public:
 			tab[i] = getc(this->file);
 		}
 		
-		for (int i = this->size; i < this->size + this->wdth_in_bytes; ++i)
+		for (int i = this->size; i < this->size + this->wdth_in_bytes; i++)
 		{
 			tab[i] = tab[i - this->wdth_in_bytes];
 		}
@@ -226,49 +226,16 @@ public:
 		this->wdth_in_bytes = this->wdth * 3 + padding; //obliczenie szerokosci w bajtach po wyrownaniu do 4
 		this->hght = this->size / this->wdth_in_bytes;
 	}
-	void write_newtab()	//przygotowanie tablicy newtab
-	{
-		newtab = new unsigned char[this->wdth * 4 * (this->hght + 1)];
-		int h = 0;
-		for (int i = 0; i <= hght; i++)
-		{
-			int _hght = i * wdth * 4;
-			for (int j = 0; j < wdth; j++)
-			{
-				int _wdth = j * 4;
-				newtab[_hght + _wdth] = tab[h++];
-				newtab[_hght + _wdth + 1] = tab[h++];
-				newtab[_hght + _wdth + 2] = tab[h++];
-				newtab[_hght + _wdth + 3] = 0;
-			}
-			h += padding;
-		}
-	}
-	void write_tab()	//przygotowuje przetworzone dane do zapisu
-	{
-		int h = 0;
-		for (int i = 0; i <= hght; i++)
-		{
-			int Wys = i * wdth * 4;
-			for (int j = 0; j < wdth; j++)
-			{
-				int Szer = j * 4;
-				tab[h++] = newtab[Wys + Szer];
-				tab[h++] = newtab[Wys + Szer + 1];
-				tab[h++] = newtab[Wys + Szer + 2];
-			}
-			h += padding;
-		}
-	}
+
 
 	void CPPThreads(int threads) //funkcja tworzaca wektor watkow z funkcjami biblioteki CPP
 	{
 		vector<thread> threads_vec(threads); //utworzenie wektora watkow
 		for (int i = 0; i < threads-1; i++)
 		{
-			threads_vec[i] = thread(CPP, this->newtab, wdth, wdth_in_bytes, int(floor(float(hght) / float(threads) * i)), int(ceil((float)hght / (float)threads) * (i + 1)));//wyliczenie poczatku i konca obszaru tab dla jednego watku
+			threads_vec[i] = thread(CPP, this->tab, wdth, wdth_in_bytes, int(floor(float(hght) / float(threads) * i)), int(ceil((float)hght / (float)threads) * (i + 1)));//wyliczenie poczatku i konca obszaru tab dla jednego watku
 		}
-		threads_vec[threads-1] = thread(CPP, this->newtab, wdth, wdth_in_bytes, int(floor(float(hght) / float(threads) * (threads-1))), int(((float)hght / (float)threads) * (threads)));//wyliczenie poczatku i konca obszaru tab dla jednego watku
+		threads_vec[threads-1] = thread(CPP, this->tab, wdth, wdth_in_bytes, int(floor(float(hght) / float(threads) * (threads-1))), int(((float)hght / (float)threads) * (threads)));//Ostatni obszar poza petla bez zaokraglenia end w gore
 
 		for (int i = 0; i < threads; i++)
 		{
@@ -282,9 +249,9 @@ public:
 		vector<thread> threads_vec(threads); //utworzenie wektora watkow
 		for (int i = 0; i < threads-1; i++)
 		{
-			threads_vec[i] = thread(ASM, this->newtab, wdth, wdth_in_bytes, int(floor(float(hght) / float(threads) * i)), int(ceil((float)hght / (float)threads) * (i + 1)));//wyliczenie poczatku i konca obszaru tab dla jednego watku
+			threads_vec[i] = thread(ASM, this->tab, wdth, wdth_in_bytes, int(floor(float(hght) / float(threads) * i)), int(ceil((float)hght / (float)threads) * (i + 1)));//wyliczenie poczatku i konca obszaru tab dla jednego watku
 		}
-		threads_vec[threads - 1] = thread(ASM, this->newtab, wdth, wdth_in_bytes, int(floor(float(hght) / float(threads) * (threads-1))), int(((float)hght / (float)threads) * (threads)));
+		threads_vec[threads - 1] = thread(ASM, this->tab, wdth, wdth_in_bytes, int(floor(float(hght) / float(threads) * (threads-1))), int(((float)hght / (float)threads) * (threads)));//Ostatni obszar poza petla bez zaokraglenia end w gore
 		for (int i = 0; i < threads; i++)
 		{
 			threads_vec[i].join();
@@ -316,15 +283,6 @@ public:
 };
 
 
-
-/*void ASM(unsigned char* data, int hght, int wdth, int threads, int index)
-{
-	HINSTANCE hGetProcIDDLL = LoadLibrary("JAAsm.dll");
-	FARPROC lpfnGetProcessID = GetProcAddress(HMODULE(hGetProcIDDLL), "MyProc2");
-	typedef void(__cdecl* pICFUNC)(unsigned char*, int, int, int, int);
-	pICFUNC function;
-	function(data, hght, wdth, threads, index);
-}*/
 
 void emptyTest() //funkcja tymczasowa do wywolania w watkach
 {
@@ -367,33 +325,15 @@ int main()
 	else
 	{
 		cout << "Wybrana biblioteka: c++\n";
-	}
+	}	
 	
-	
-	//FILE* f = fopen(name, "rb");
-	//unsigned char header[54];
-	//fread(header, sizeof(unsigned char), 54, f); //zczytanie naglowka pliku bmp
-
-	//wydobycie szerokosci i wysokosci z naglowka
-	//int wdth = *(int*)&header[18];
-	//int hght = *(int*)&header[22];
-
-	//int size = 3 * wdth * hght; // rozmiar tablicy pikseli (b, g, r)
-	//unsigned char* data = new unsigned char[size]; //alokowanie 3 bajtow na piksel
-	//fread(data, sizeof(unsigned char), size, f); //zczytanie wartosci kolorow pikseli
-	//fclose(f);
-	//for (int i = 0; i < size/100;)
-	//{
-	//	cout << (float)data[i] << " " << (float)data[i + 1] << " " << (float)data[i + 2] << "\n";
-	//	i += 3;
-	//}
 	if (ifAsm)//korzystaj z biblioteki asm, jesli uzytkownik tego chce
 	{
 		if (bmp.loadfile(name))
 		{
-			bmp.write_newtab();
+			
 			bmp.ASMThreads(threads);
-			bmp.write_tab();
+			
 			bmp.savefile(newname);
 		}
 	}
@@ -401,34 +341,14 @@ int main()
 	{
 		if (bmp.loadfile(name))
 		{
-			bmp.write_newtab();
+			
 			bmp.CPPThreads(threads);
-			bmp.write_tab();
+			
 			bmp.savefile(newname);
 		}
-		//vector<thread>threadsVec(threads);
-		//clock_t start = clock();
-		//for (int i = 0; i < threads; i++)
-		//{
-		//	threadsVec[i] = thread(CPP,data, hght, wdth, threads, i+1);
-			
-		//	threadsVec[i].join();
-		//}
-		//cout << "Watki: " << threads << " czas: " << (float)(clock() - start)/CLOCKS_PER_SEC;
+		
 	}
-	//FILE* newf = fopen(newname, "w"); //utworzenie pustego pliku
-	//fclose(newf);
-	//newf = fopen(newname, "a");  //dopisanie do pliku nowej bitmapy
 	
-	//fwrite(header, sizeof(unsigned char), 54, newf); //dodanie naglowka do nowego pliku bmp
-	//fwrite(data, sizeof(unsigned char), size, newf); //dopisanie wartosci pikseli do pliku bmp
-	//fclose(newf);
-	//cout << "\n\nNOWE\n\n";
-	//for (int i = 0; i < size / 100;)
-	//{
-	//	cout << (float)data[i] << " " << (float)data[i + 1] << " " << (float)data[i + 2] << "\n";
-	//	i += 3;
-	//}
 	
 	
 	return 0;

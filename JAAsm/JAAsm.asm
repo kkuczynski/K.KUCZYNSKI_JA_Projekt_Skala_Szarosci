@@ -75,7 +75,7 @@ jae _end_fori
 		_retfori:
 		
 
-add rsi, r11	;przesuniecie wskaznika o ilosc zer, ktore sa konuc, wyliczonych wczesniej
+add rsi, r11	;przesuniecie wskaznika o ilosc zer, ktore sa na koncu wyliczonych wczesniej
 inc r15d		;inkrementacja licznika i++
 jmp _fori		;skok do petli fori
 _end_fori:      ;jak sie petla konczy to return
