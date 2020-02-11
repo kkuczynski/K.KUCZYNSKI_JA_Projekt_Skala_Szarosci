@@ -8,17 +8,29 @@
 
 extern "C" _declspec(dllexport)void MyProc2(unsigned char* bmptab, int wdth, int wdth_in_bytes, int start, int end)
 {
-	int color = 0;
-	int _size = wdth * 3 * (end - start); //rozmiar obszaru przetwarzanego w tym watku
-	for (int j = start * 3 * wdth; j < end * 3 * wdth; j += 3)
+	unsigned char padding = 0;		// dla uzyskania podzielnosci pikseli w rzedzie przez 4
+	int index = start*wdth_in_bytes;				
+
+	int color;
+	if ((wdth * 3) % 4 != 0)
 	{
+		padding = 4 - ((wdth * 3) % 4);
+	}
 
+	for (int j = start; j < end; j++) // petla po wysokosci
+	{
+		for (int i = 0; i < wdth; ++i) // pêtla po szerokosci
+		{
 
-		color = (bmptab[j] + bmptab[j + 1] + bmptab[j + 2]) / 3; //wyliczenie sredniej kolorow pixeli ->BGR 
-		bmptab[j] = color; 
-		bmptab[j + 1] = color; 
-		bmptab[j + 2] = color; //przypisanie tej samej wartosci rownej sredniej poszczegolnym wartosciom B G i R
+			color = (0.11*bmptab[index] + 0.59*bmptab[index + 1] + 0.30*bmptab[index]);	//obliczenie przyjaznej dla oka skali szarosci
+			bmptab[index] = color;
+			bmptab[index + 1] = color;
+			bmptab[index + 2] = color;
 
+			index += 3; //przesuniecie indeksu o 3 po przetworzeniu skladowych koloru jednego piksela
+		}
+		index += padding; // wyrownianie wiersza do podzielnosci przez 3
+	
 	}
 	
 }

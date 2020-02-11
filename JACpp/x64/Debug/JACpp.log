@@ -1,2 +1,3 @@
 ﻿  JACpp.cpp
+C:\Users\Krzyś\source\repos\K.KUCZYNSKI_JA_Projekt_Skala_Szarosci\JACpp\JACpp.cpp(25,57): warning C4244:  '=': conversion from 'double' to 'int', possible loss of data
   JACpp.vcxproj -> C:\Users\Krzyś\source\repos\K.KUCZYNSKI_JA_Projekt_Skala_Szarosci\x64\Debug\JACpp.dll

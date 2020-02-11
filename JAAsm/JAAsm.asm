@@ -1,5 +1,7 @@
 .DATA
-three REAL8 3.0
+red REAL4 0.30
+green REAL4 0.59
+blue REAL4 0.11
 .CODE
 DllEntry PROC hInstDLL:DWORD, reason:DWORD, reserved1:DWORD
 mov rax, 1
@@ -9,11 +11,30 @@ DllEntry ENDP
 MyProc proc tab:qword,wdth:qword,wdthbytes:qword,start:dword,theend:dword
 
 ;inicjalizacja zmiennych
+
 mov tab, rcx
 mov wdth, rdx
 mov wdthbytes, r8
 mov start, r9d
 mov r10d, theend
+
+mov eax, blue
+pinsrd xmm4, eax, 0 ;przygotowanie wektora z przelicznikiem koloru niebieskiego
+pinsrd xmm4, eax, 1
+pinsrd xmm4, eax, 2
+pinsrd xmm4, eax, 3
+
+mov eax, green
+pinsrd xmm5, eax, 0 ;przygotowanie wektora z przelicznikiem koloru zielonego
+pinsrd xmm5, eax, 1
+pinsrd xmm5, eax, 2
+pinsrd xmm5, eax, 3
+
+mov eax, red
+pinsrd xmm6, eax, 0 ;przygotowanie wektora z przelicznikiem koloru czerwonego
+pinsrd xmm6, eax, 1
+pinsrd xmm6, eax, 2
+pinsrd xmm6, eax, 3
 
 ;obliczam ilosc zer
 mov r11,r8		;do r11 wpisuje wartosc znajdujaca sie w r8: wdthbytes
@@ -28,7 +49,7 @@ mov rsi, rcx	;wskaznik mapy obrazu, punkt poczatkowy obrazu
 mov rax, 0		;zeruje rax
 mov eax, r9d	;do eax wpisuje start - wysokosc poczatku dla danego watku
 mul r8			;mnoz wdthbytes
-mov r12, rax	;do r12 wpisujemy rax- pole
+mov r12, rax	;do r12 wpisuje rax- pole
 add rsi,r12		;do rsi dodaje przesuniecie - przesuwanie wskaznika
 
 mov rdx, wdth   ;do rdx wpisuje szerokosc
@@ -45,31 +66,73 @@ jae _end_fori
 		_forj:
 		cmp r14, rdx	;j<wdth
 		jae _end_forj
+		movzx eax, byte ptr[rsi] ;przenosze 8 bitowy kolor z wypenieniem zerami do 32 bitowego akumulatora
+		pinsrd xmm1, eax, 0  ;xmm1 z wartosciami kolorow niebieskich 4 pikseli
+		movzx eax, byte ptr[rsi+3]
+		pinsrd xmm1, eax, 1
+		movzx eax, byte ptr[rsi+6]
+		pinsrd xmm1, eax, 2
+		movzx eax, byte ptr[rsi+9]
+		pinsrd xmm1, eax, 3
+		;cvtdq2ps xmm1, xmm1 - usunieta, zbedna konwersja na float
+		mulps xmm1, xmm4 ;blue*0.11
 
-				movzx eax, byte ptr[rsi]	;pobieram pierwszy kolor do eax, niebieski
-		;wektorowa instrukcja
-				cvtsi2sd xmm1,eax			;zamiana 32bitowej wartosci ca³kowitoliczbowej do 64bajtowej zmiennoprzecinkowej czyli przekazanie wartosci koloru blue do xmm1
-				movzx eax, byte ptr[rsi+1]  ;pobieram drugi kolor do eax, zielony
-		;wektorowa isntrukcja
-				cvtsi2sd xmm2,eax			;zamiana 32bitowej wartosci ca³kowitoliczbowej do 64bajtowej zmiennoprzecinkowej
-				movzx eax, byte ptr[rsi+2]  ;pobieram trzeci kolor, czerwony
-		;wektorowa instrukcja
-				cvtsi2sd xmm3,eax			;zamiana 32bitowej wartosci ca³kowitoliczbowej do 64bajtowej zmiennoprzecinkowej
 
-			;wektorowa isntrukcja
-			;obliczanie sredniej kolorow
-				addsd xmm1,xmm2				;dodanie do xmm1 wartosci z xmm2 (B+G)
-				addsd xmm1,xmm3				;dodanie do poprzednio uzyskanej xmm1 wartosci z xmm3 ((B+G)+R)
-				divsd xmm1,three			;dzielenie xmm1 przez 3 - czyli wyliczanie sredniej, by uzyskac kolor szarosci
+		movzx eax, byte ptr[rsi+1]
+		pinsrd xmm2, eax, 0  ;xmm2 z wartosciami kolorow zielonych 4 pikseli
+		movzx eax, byte ptr[rsi+4]
+		pinsrd xmm2, eax, 1
+		movzx eax, byte ptr[rsi+7]
+		pinsrd xmm2, eax, 2
+		movzx eax, byte ptr[rsi+10]
+		pinsrd xmm2, eax, 3
+		;cvtdq2ps xmm2, xmm2
+		mulps xmm2, xmm5 ;green*0.59
 
-			;wektorowa instrukcja
-				cvttsd2si eax,xmm1		 ;zamiana 64bajtowej wartosci zmienorzecinkowej do 32bitowej ca³kowitoliczbowej, odwrotny proces do tego co wyzej
-				mov byte ptr[rsi],al	 ;zapisanie nowego "koloru" w miejsce skad byl pobierany, niebieski
-				mov byte ptr[rsi+1],al	 ;zapisanie nowego "koloru" w miejsce skad byl pobierany, zielony
-				mov byte ptr[rsi+2],al	 ;zapisanie nowego "koloru" w miejsce skad byl pobierany, czerwony
 
-		add rsi,3		;przejscie do kolejnego pixela
-		inc r14			;inkrementacja j++
+		movzx eax, byte ptr[rsi+2]
+		pinsrd xmm3, eax, 0  ;xmm3 z wartosciami kolorow czerwonych 4 pikseli
+		movzx eax, byte ptr[rsi+5]
+		pinsrd xmm3, eax, 1
+		movzx eax, byte ptr[rsi+8]
+		pinsrd xmm3, eax, 2
+		movzx eax, byte ptr[rsi+11]
+		pinsrd xmm3, eax, 3
+		;cvtdq2ps xmm3, xmm3
+		mulps xmm3, xmm6 ;red*0.3
+
+		;cvtps2dq xmm1, xmm1
+		;cvtps2dq xmm2, xmm2
+		;cvtps2dq xmm3, xmm3
+		paddusb	 xmm1, xmm2	;dodanie w pionie wartosci xmm1 i xmm2 do xmm1, czyli 4x b+g
+		paddusb xmm1, xmm3  ;dodanie w pionie wartosci xmm1 i xmm3 do xmm1, czyli 4x (b+g)+r
+
+	   
+
+		pextrd eax, xmm1, 0 ;zaladowanie wartosci sredniej kolorow pierwszego piksela do 32-bitowego akumulatora
+		mov byte ptr[rsi], al ;przepisanie wartosci 8 najmlodszych bitów akumulatora na miejsce trzech kolorow pierwszego piksela
+		mov byte ptr[rsi+1], al
+		mov byte ptr[rsi+2], al
+
+		pextrd	eax, xmm1, 1 ;drugi piksel
+		mov	byte ptr[rsi+3], al
+		mov	byte ptr[rsi+4], al
+		mov	byte ptr[rsi+5], al
+
+		pextrd	eax, xmm1, 2 ;trzeci piksel
+		mov	byte ptr[rsi+6], al
+		mov	byte ptr[rsi+7], al
+		mov	byte ptr[rsi+8], al
+		
+		pextrd	eax, xmm1, 3 ;czwarty piksel
+		mov	byte ptr[rsi+9], al
+		mov	byte ptr[rsi+10], al
+		mov	byte ptr[rsi+11], al
+
+
+
+		add rsi,12		;przejscie do kolejnych 4 pikseli
+		add r14, 4		;dodanie 4 do j - przesuniecie o 4 piksele w bok
 		jmp _forj		;skok do petli j
 		_end_forj:
 		_retfori:
